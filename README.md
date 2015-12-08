@@ -69,7 +69,7 @@ We have a [JavaScript Style Guidelines Page Here](./JavaScript.md)
            end
     ```
 
-* Align function arguments either all on the same line or one per line.
+* Align function parameters either all on the same line or one per line.
 
     ```ruby
     # good
@@ -87,6 +87,24 @@ We have a [JavaScript Style Guidelines Page Here](./JavaScript.md)
     def self.create_translation(phrase_id, phrase_key, target_locale,
                                 value, user_id, do_xss_check, allow_verification)
       ...
+    end
+    ```
+
+* Indent succeeding lines in multi-line boolean expressions.
+
+    ```ruby
+    # good
+    def is_eligible?(user)
+      Trebuchet.current.launch?(ProgramEligibilityHelper::PROGRAM_TREBUCHET_FLAG) &&
+        is_in_program?(user) &&
+        program_not_expired
+    end
+
+    # bad
+    def is_eligible?(user)
+      Trebuchet.current.launch?(ProgramEligibilityHelper::PROGRAM_TREBUCHET_FLAG) &&
+      is_in_program?(user) &&
+      program_not_expired
     end
     ```
 
@@ -187,7 +205,7 @@ end
 <% if @presenter.guest_visa_russia? %>
   <%= icon_tile_for(I18n.t("email.reservation_confirmed_guest.visa.details_header",
                            :default => "Visa for foreign Travelers"),
-                    :beveled_big_icon => "stamp" do %>
+                    :beveled_big_icon => "stamp") do %>
     <%= I18n.t("email.reservation_confirmed_guest.visa.russia.details_copy",
                :default => "Foreign guests travelling to Russia may need to obtain a visa...") %>
   <% end %>
@@ -208,7 +226,7 @@ end
 
 ```erb
 <% if @presenter.guest_visa_russia? %>
-  <%= icon_tile_for(I18n.t("email.reservation_confirmed_guest.visa.details_header", :default => "Visa for foreign Travelers"), :beveled_big_icon => "stamp" do %>
+  <%= icon_tile_for(I18n.t("email.reservation_confirmed_guest.visa.details_header", :default => "Visa for foreign Travelers"), :beveled_big_icon => "stamp") do %>
     <%= I18n.t("email.reservation_confirmed_guest.visa.russia.details_copy", :default => "Foreign guests travelling to Russia may need to obtain a visa prior to...") %>
   <% end %>
 <% end %>
@@ -341,7 +359,7 @@ def fallbacks_for(the_locale, opts = {})
   #    children).
   # 1) The default locale is just a language. (Like :en, and not :"en-US".)
   if opts[:exclude_default] &&
-      ret.last == self.default_locale &&
+      ret.last == default_locale &&
       ret.last != language_from_locale(the_locale)
     ret.pop
   end
@@ -401,15 +419,15 @@ Never leave commented-out code in our codebase.
 
 ### Method definitions
 
-* Use `def` with parentheses when there are arguments. Omit the
-  parentheses when the method doesn't accept any arguments.
+* Use `def` with parentheses when there are parameters. Omit the
+  parentheses when the method doesn't accept any parameters.
 
      ```Ruby
      def some_method
        # body omitted
      end
 
-     def some_method_with_arguments(arg1, arg2)
+     def some_method_with_parameters(arg1, arg2)
        # body omitted
      end
      ```
@@ -469,9 +487,7 @@ Never leave commented-out code in our codebase.
     f(3 + 2) + 1
     ```
 
-**Omit parentheses** for a method call:
-
-* If the method accepts no arguments.
+* **Omit parentheses** for a method call if the method accepts no arguments.
 
     ```ruby
     # bad
@@ -481,13 +497,13 @@ Never leave commented-out code in our codebase.
     nil?
     ```
 
-* If the method doesn't return a value (or we don't care about the return).
+* If the method doesn't return a value (or we don't care about the return), parentheses are optional. (Especially if the arguments overflow to multiple lines, parentheses may add readability.)
 
     ```ruby
-    # bad
+    # okay
     render(:partial => 'foo')
 
-    # good
+    # okay
     render :partial => 'foo'
     ```
 
@@ -522,7 +538,7 @@ In either case:
     end
     ```
 
-* The `and` and `or` keywords are banned. It's just not worth it. Always use `&&` and `||` instead.
+* The `and`, `or`, and `not` keywords are banned. It's just not worth it. Always use `&&`, `||`, and `!` instead.
 
 * Modifier `if/unless` usage is okay when the body is simple, the
   condition is simple, and the whole thing fits on one line. Otherwise,
@@ -543,7 +559,7 @@ In either case:
     parts[i] = part.to_i(INTEGER_BASE) if !part.nil? && [0, 2, 3].include?(i)
 
     # okay
-    return if self.reconciled?
+    return if reconciled?
     ```
 
 * Never use `unless` with `else`. Rewrite these with the positive case first.
@@ -594,7 +610,7 @@ In either case:
     end
 
     # ok
-    if (x = self.next_value)
+    if (x = next_value)
       ...
     end
     ```
@@ -629,8 +645,22 @@ In either case:
     end
     ```
 
-* Avoid multi-line `?:` (the ternary operator), use `if/then/else/end` instead.
+* Avoid multiple conditions in ternaries. Ternaries are best used with single conditions.
 
+* Avoid multi-line `?:` (the ternary operator), use `if/then/else/end` instead.
+    ```Ruby
+    # bad
+    some_really_long_condition_that_might_make_you_want_to_split_lines ?
+      something : something_else
+
+    # good
+    if some_really_long_condition_that_might_make_you_want_to_split_lines
+      something
+    else
+      something_else
+    end
+    ```
+  
 ## Syntax
 
 * Never use `for`, unless you know exactly why. Most of the time iterators
@@ -665,9 +695,7 @@ In either case:
     names.each { |name| puts name }
 
     # bad
-    names.each do |name|
-      puts name
-    end
+    names.each do |name| puts name end
 
     # good
     names.select { |name| name.start_with?("S") }.map { |name| name.upcase }
@@ -700,7 +728,7 @@ In either case:
   assignment with parenthesis.
 
     ```Ruby
-    # good - shows intented use of assignment
+    # good - shows intended use of assignment
     if (v = array.grep(/foo/))
       ...
     end
@@ -711,7 +739,7 @@ In either case:
     end
 
     # also good - shows intended use of assignment and has correct precedence
-    if (v = self.next_value) == "hello"
+    if (v = next_value) == "hello"
       ...
     end
     ```
@@ -739,7 +767,7 @@ In either case:
   one-liner scripts is discouraged. Prefer long form versions such as
   `$PROGRAM_NAME`.
 
-* Use `_` for unused block parameters.
+* Use `_` for unused block arguments.
 
     ```Ruby
     # bad
@@ -753,15 +781,38 @@ In either case:
   reading an attribute or calling one method with no arguments, use the `&:`
   shorthand.
 
-    ```ruby
-    # bad
-    bluths.map { |bluth| bluth.occupation }
-    bluths.select { |bluth| bluth.blue_self? }
+  ```ruby
+  # bad
+  bluths.map { |bluth| bluth.occupation }
+  bluths.select { |bluth| bluth.blue_self? }
 
-    # good
-    bluths.map(&:occupation)
-    bluths.select(&:blue_self?)
-    ```
+  # good
+  bluths.map(&:occupation)
+  bluths.select(&:blue_self?)
+  ```
+
+* Prefer `some_method` over `self.some_method` when calling a method on the
+  current instance.
+
+  ```ruby
+  # bad
+  def end_date
+    self.start_date + self.nights
+  end
+
+  # good
+  def end_date
+    start_date + nights
+  end
+  ```
+
+  In the following three common cases, `self.` is required by the language
+  and is good to use:
+
+  1. When defining a class method: `def self.some_method`.
+  2. The *left hand side* when calling an assignment method, including assigning
+     an attribute when `self` is an ActiveRecord model: `self.guest = user`.
+  3. Referencing the current instance's class: `self.class`.
 
 ## Naming
 
@@ -860,7 +911,7 @@ in inheritance.
     ```
 
 * Indent the `public`, `protected`, and `private` methods as much the
-  method definitions they apply to. Leave one blank line above them.
+  method definitions they apply to. Leave one blank line above and below them.
 
     ```Ruby
     class SomeClass
@@ -869,6 +920,7 @@ in inheritance.
       end
 
       private
+
       def private_method
         # ...
       end
@@ -1147,6 +1199,20 @@ in inheritance.
     }
     ```
 
+* Use a trailing comma in an `Array` that spans more than 1 line
+    ```ruby
+    # good
+    array = [1, 2, 3]
+
+    # good
+    array = [
+      "car",
+      "bear",
+      "plane",
+      "zoo",
+    ]
+    ```
+
 ## Strings
 
 * Prefer string interpolation instead of string concatenation:
@@ -1159,8 +1225,8 @@ in inheritance.
     email_with_name = "#{user.name} <#{user.email}>"
     ```
 
-    Furthermore, keep in mind Ruby 1.9-style interpolation. Let's say you have
-    are composing cache keys like this:
+    Furthermore, keep in mind Ruby 1.9-style interpolation. Let's say you are
+    composing cache keys like this:
 
     ```ruby
     CACHE_KEY = '_store'
@@ -1168,7 +1234,7 @@ in inheritance.
     cache.write(@user.id + CACHE_KEY)
     ```
 
-    Prefer instead string interpolation instead of string concatentation:
+    Prefer string interpolation instead of string concatentation:
 
     ```ruby
     CACHE_KEY = '%d_store'
