@@ -4,9 +4,7 @@ This is RailsOnMaui's Ruby Style Guide.
 
 It is a fork of the [AirBnb Ruby Guide][airbnb-ruby], which was inspired by [Github's guide][github-ruby] and [Bozhidar Batsov's guide][bbatsov-ruby].
 
-Airbnb also maintains a [JavaScript Style Guide][airbnb-javascript].
-
-We have a [JavaScript Style Guidelines Page Here](./JavaScript.md)
+We have a [JavaScript Style Guidelines Page Here](https://github.com/shakacode/style-guide-javascript)
 
 
 ## Table of Contents
